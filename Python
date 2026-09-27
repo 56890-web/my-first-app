@@ -1,0 +1,83 @@
+import streamlit as st
+
+# หัวข้อแอปพลิเคชัน
+st.markdown("# 🛒 ร้านค้าขายเครื่องเขียนราคาถูก: สมุดมิตร")
+st.write("ยินดีต้อนรับเข้าสู่ระบบคำนวณราคาสินค้าและส่วนลดประจำร้าน")
+st.divider()
+
+# ส่วนรับจำนวนสินค้า 4 รายการ (ตามโจทย์ในใบงาน)
+st.subheader("📦 เลือกจำนวนสินค้าที่ต้องการซื้อ")
+col1, col2 = st.columns(2)
+
+with col1:
+    qty_notebook = st.number_input("สมุด (13 บาท):", min_value=0, value=0, step=1)
+    qty_pen = st.number_input("ปากกา (10 บาท):", min_value=0, value=0, step=1)
+    qty_pencil = st.number_input("ดินสอ (7 บาท):", min_value=0, value=0, step=1)
+    qty_eraser = st.number_input("ยางลบ (5 บาท):", min_value=0, value=0, step=1)
+
+with col2:
+    qty_liquid = st.number_input("ลิควิดน้ำ (15 บาท):", min_value=0, value=0, step=1)
+    qty_tape = st.number_input("ลิควิดเทป (20 บาท):", min_value=0, value=0, step=1)
+    qty_ruler = st.number_input("ไม้บรรทัด (16 บาท):", min_value=0, value=0, step=1)
+    qty_pencil_case = st.number_input("กระเป๋าดินสอ (39 บาท):", min_value=0, value=0, step=1)
+
+# ปุ่มคำนวณ
+if st.button("💰 คำนวณเงินและส่วนลด"):
+    # คำนวณราคารวมทั้งหมด
+    total_price = (
+        (qty_notebook * 13) +
+        (qty_pen * 10) +
+        (qty_pencil * 7) +
+        (qty_eraser * 5) +
+        (qty_liquid * 15) +
+        (qty_tape * 20) +
+        (qty_ruler * 16) +
+        (qty_pencil_case * 39)
+    )
+
+    st.write("---")
+    st.write(f"**ราคารวมสินค้าทั้งหมด:** {total_price} บาท")
+
+    # เงื่อนไขส่วนลด (ตามเกณฑ์ในใบงานหัวข้อที่ 1)
+    # - ยอดซื้อ 500-700 บาท -> ลด 2%
+    # - ยอดซื้อ 701-900 บาท -> ลด 4%
+    # - ยอดซื้อ 901 บาทขึ้นไป -> ลด 5%
+    if 500 <= total_price <= 700:
+        discount_percent = 2
+        discount_amount = total_price * 0.02
+    elif 701 <= total_price <= 900:
+        discount_percent = 4
+        discount_amount = total_price * 0.04
+    elif total_price > 900:
+        discount_percent = 5
+        discount_amount = total_price * 0.05
+    else:
+        discount_percent = 0
+        discount_amount = 0
+
+    net_price = total_price - discount_amount
+
+    if discount_percent > 0:
+        st.info(f"🎉 ยอดซื้อเข้าเกณฑ์รับส่วนลด {discount_percent}% (ลดไป {discount_amount:.2f} บาท)")
+    else:
+        st.warning("⚠️ ยอดซื้อไม่ถึง 500 บาท (ไม่มีส่วนลด)")
+
+    st.header(f"ยอดเงินที่ต้องจ่ายจริง: **{net_price:.2f}** บาท")
+
+    # ระบบรับเงินจากลูกค้า และคำนวณเงินทอน
+    st.write("---")
+    cash_received = st.number_input("รับเงินจากลูกค้า (บาท):", min_value=0.0, value=float(net_price), step=10.0)
+
+    if cash_received >= net_price:
+        change = cash_received - net_price
+        st.success(f"💵 เงินทอน: **{change:.2f}** บาท")
+    else:
+        st.error("❌ เงินสดที่รับมาน้อยกว่ายอดที่ต้องจ่าย กรุณาตรวจสอบอีกครั้ง")
+
+# แสดงรายชื่อสมาชิกกลุ่มในหน้าเว็บ (อ้างอิงจากตารางในใบงาน)
+st.divider()
+st.markdown("### 👥 รายชื่อสมาชิกกลุ่ม")
+st.write("1. วรัญญา เชื้อชาย เลขที่ 33 (หัวหน้ากลุ่ม)")
+st.write("2. นันท์ลภัส จำติะ เลขที่ 30")
+st.write("3. พรสภัส ต้องมีเกียรติกุล เลขที่ 31")
+st.write("4. ภาคิณ ดวงศรี เลขที่ 35")
