@@ -1,14 +1,66 @@
-# บรรทัดที่ 1   นำเข้า Library ที่เกี่ยวข้อง
 import streamlit as st
 
-# บรรทัดที่ 2   สร้างหัวข้อ “แอปพลิเคชั่นแปลง พ.ศ. เป็น ค.ศ.”
-st.title("แอปพลิเคชั่นแปลง พ.ศ. เป็น ค.ศ.")
+# ตั้งค่าหน้าเว็บ
+st.markdown("# :blue[🛒 ร้านค้าขายเครื่องเขียน สมุดมิตร]")
+st.write("ยินดีต้อนรับเข้าสู่ระบบคำนวณเงินและส่วนลดอัตโนมัติ")
+st.write("---")
 
-# บรรทัดที่ 4   สร้างตัวแปร bh_year เก็บข้อมูลชื่อจากกล่องรับข้อมูลตัวเลข โดยกำหนดค่าที่เริ่มแสดงเป็น 2569
-bh_year = st.number_input("กรอกปี พ.ศ.", value=2569, step=1)
+# ส่วนที่ 1: รับจำนวนสินค้าแต่ละรายการจากผู้ใช้งาน
+st.subheader("📝 เลือกจำนวนสินค้าที่ต้องการซื้อ")
+qty_notebook = st.number_input("สมุด (13 บาท)", min_value=0, value=0, step=1)
+qty_pen = st.number_input("ปากกา (10 บาท)", min_value=0, value=0, step=1)
+qty_pencil = st.number_input("ดินสอ (7 บาท)", min_value=0, value=0, step=1)
+qty_eraser = st.number_input("ยางลบ (5 บาท)", min_value=0, value=0, step=1)
+qty_correction = st.number_input("ลิควิดน้ำ (15 บาท)", min_value=0, value=0, step=1)
+qty_tape = st.number_input("ลิควิดเทป (20 บาท)", min_value=0, value=0, step=1)
+qty_ruler = st.number_input("ไม้บรรทัด (16 บาท)", min_value=0, value=0, step=1)
 
-# บรรทัดที่ 5   สร้างตัวแปร ce_year เก็บข้อมูลในตัวแปร bh_year - 543
-ce_year = bh_year - 543
+# ส่วนที่ 2: คำนวณราคารวมทั้งหมด
+if st.button("คำนวณเงินทั้งหมด 💰"):
+    total_price = (
+        (qty_notebook * 13) +
+        (qty_pen * 10) +
+        (qty_pencil * 7) +
+        (qty_eraser * 5) +
+        (qty_correction * 15) +
+        (qty_tape * 20) +
+        (qty_ruler * 16)
+    )
+    
+    st.write("---")
+    st.write(f"ยอดซื้อรวมทั้งหมด: **{total_price} บาท**")
 
-# บรรทัดที่ 6   สร้างหัวข้อความแสดงคำตอบที่แปลงเป็นปี ค.ศ. จากในตัวแปร ce_year โดย f คือให้ข้อความเชื่อมกับตัวเลขในตัวแปร
-st.subheader(f"ปี ค.ศ. คือ: {ce_year}")
+    # ส่วนที่ 3: เช็คเงื่อนไข if-else เพื่อคำนวณส่วนลดประจำร้าน
+    # เกณฑ์: ยอดซื้อ 500-700 ลด 2% | 701-900 ลด 4% | 901 ขึ้นไป ลด 5%
+    if 500 <= total_price <= 700:
+        discount_rate = 0.02
+        discount_text = "ลด 2%"
+    elif 701 <= total_price <= 900:
+        discount_rate = 0.04
+        discount_text = "ลด 4%"
+    elif total_price > 900:
+        discount_rate = 0.05
+        discount_text = "ลด 5%"
+    else:
+        discount_rate = 0.0
+        discount_text = "ไม่มีส่วนลด (ยอดซื้อไม่ถึง 500 บาท)"
+
+    discount_amount = total_price * discount_rate
+    final_price = total_price - discount_amount
+
+    st.info(f"สิทธิ์ส่วนลดของคุณ: {discount_text} (ส่วนลด {discount_amount:.2f} บาท)")
+    st.header(f"ยอดเงินที่ต้องจ่ายจริง: **{final_price:.2f} บาท**")
+
+    # ส่วนที่ 4: รับเงินจากลูกค้า และคำนวณเงินทอน
+    st.write("---")
+    cash_received = st.number_input("รับเงินสดจากลูกค้า (บาท):", min_value=0.0, value=0.0)
+    
+    if cash_received > 0:
+        if cash_received >= final_price:
+            change = cash_received - final_price
+            st.success(f"💵 เงินทอน: **{change:.2f} บาท**")
+        else:
+            st.error("⚠️ เงินสดที่รับมาไม่พอจ่าย กรุณาตรวจสอบใหม่อีกครั้ง")
+
+st.divider()
+st.write("ผู้จัดทำ: ภาคิณ ดวงศรี เลขที่ 35 ม.4/...")
